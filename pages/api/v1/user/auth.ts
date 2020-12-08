@@ -5,17 +5,17 @@ import Joi from "joi";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const { TOKEN_SECRET } = process.env;
-import verifyToken from "../../../../util/verifyToken";
+
 const authSchema = Joi.object({
   email: Joi.string().required().email(),
   pwd: Joi.string().required(),
 });
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+  //connect to database
+  const { db } = await connectToDatabase();
   switch (req.method) {
     case "POST":
-      const { db } = await connectToDatabase();
-
       //validate body req
       const { error } = authSchema.validate(req.body);
       if (!!error) {

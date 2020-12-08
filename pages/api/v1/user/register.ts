@@ -61,16 +61,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       });
       try {
         await db.collection("users").insertOne(user);
-        res.statusCode = 200;
-        res.json({ user: user._id });
+        res.status(201).json({ user: user._id });
       } catch (err) {
-        res.statusCode = 502;
-        res.json({ error: err });
+        res.status(502).json({ error: err });
       }
-
       break;
     default:
-      res.statusCode = 405;
-      res.json({ error: "Method not Allowed" });
+      res.status(405).json({ error: "Method not Allowed" });
   }
 };

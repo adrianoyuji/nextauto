@@ -42,6 +42,11 @@ export enum Title {
   rebuild = "rebuilt",
   import = "import",
 }
+export enum Currency {
+  USD = "USD",
+  CAD = "CAD",
+  BRL = "BRL",
+}
 
 export enum Transmission {
   manual = "manual",
@@ -51,12 +56,13 @@ export enum Transmission {
 }
 
 export interface Years extends Document {
-  firstYear: string;
-  secondYear: string;
+  firstYear: number;
+  secondYear: number;
 }
 
 export interface Features extends Document {
   cylinders?: string;
+  engine?: string;
   drive: Drive;
   fuel: Fuel;
   color: string;
@@ -68,8 +74,12 @@ export interface Features extends Document {
 }
 
 export interface Mileage extends Document {
-  value: string;
+  value: number;
   unit: Unit;
+}
+export interface Price extends Document {
+  value: number;
+  currency: Currency;
 }
 export interface Location extends Document {
   state: string;
@@ -85,24 +95,25 @@ export interface ISale extends Document {
   createdAt: Date;
   features: Features;
   year: Years;
-  price: number;
+  price: Price;
   photo: Array<string>;
   ownerId: string;
   location: Location;
 }
 
-const SaleSchema: Schema = new Schema(
+export const SaleSchema: Schema = new Schema(
   {
     car_make: { type: String, required: true },
     car_model: { type: String, required: true },
     version: { type: String, required: true },
     mileage: {
-      value: { type: String, required: true },
+      value: { type: Number, required: true },
       unit: { type: String, required: true },
     },
     description: { type: String },
     createdAt: { type: Date, default: Date.now },
     features: {
+      engine: { type: String },
       cylinders: { type: String },
       drive: { type: String, required: true },
       fuel: { type: String, required: true },
@@ -114,15 +125,18 @@ const SaleSchema: Schema = new Schema(
       doors: { type: String },
     },
     year: {
-      firstYear: { type: String, required: true },
-      secondYear: { type: String, required: true },
+      firstYear: { type: Number, required: true },
+      secondYear: { type: Number, required: true },
     },
-    price: { type: Number, required: true },
+    price: {
+      value: { type: Number, required: true },
+      currency: { type: String, required: true },
+    },
     photos: [],
     ownerId: { type: String, required: true },
     location: { state: { type: String }, country: { type: String } },
   },
   { timestamps: true }
 );
-
-export default mongoose.model<ISale>("Sale", SaleSchema);
+export default mongoose.models.Sale ||
+  mongoose.model<ISale>("Sale", SaleSchema);
