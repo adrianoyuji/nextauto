@@ -45,8 +45,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(400).json({ error: "Invalid password" });
       } else {
         const token = jwt.sign({ _id: user._id }, TOKEN_SECRET);
-        res;
-
         res.status(200).json({ user: user, token: token });
       }
 
