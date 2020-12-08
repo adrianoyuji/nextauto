@@ -5,6 +5,7 @@ import Joi from "joi";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 const { TOKEN_SECRET } = process.env;
+import verifyToken from "../../../../util/verifyToken";
 const authSchema = Joi.object({
   email: Joi.string().required().email(),
   pwd: Joi.string().required(),
@@ -13,13 +14,19 @@ const authSchema = Joi.object({
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case "POST":
+      const validToken = verifyToken({ req, res });
+
+      if (!validToken) {
+        res.status(401).json({ error: "Not authorized" });
+        break;
+      }
+
       const { db } = await connectToDatabase();
 
       //validate body req
       const { error } = authSchema.validate(req.body);
       if (!!error) {
-        res.statusCode = 400;
-        res.json({ error: error });
+        res.status(400).json({ error: error });
         break;
       }
 
@@ -28,26 +35,23 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         .collection("users")
         .findOne({ email: req.body.email });
       if (!user) {
-        res.statusCode = 400;
-        res.json({ error: "Invalid email" });
+        res.status(400).json({ error: "Invalid email" });
         break;
       }
 
       //checks if password is correct
       const validPwd = await bcrypt.compare(req.body.pwd, user.pwd);
       if (!validPwd) {
-        res.status(400);
-        res.json({ error: "Invalid password" });
+        res.status(400).json({ error: "Invalid password" });
       } else {
         const token = jwt.sign({ _id: user._id }, TOKEN_SECRET);
-        res.status(200);
+        res;
 
-        res.json({ user: user, token: token });
+        res.status(200).json({ user: user, token: token });
       }
 
       break;
     default:
-      res.statusCode = 405;
-      res.json({ error: "Method not Allowed" });
+      res.status(405).json({ error: "Method not Allowed" });
   }
 };
