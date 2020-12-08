@@ -14,13 +14,6 @@ const authSchema = Joi.object({
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   switch (req.method) {
     case "POST":
-      const validToken = verifyToken({ req, res });
-
-      if (!validToken) {
-        res.status(401).json({ error: "Not authorized" });
-        break;
-      }
-
       const { db } = await connectToDatabase();
 
       //validate body req
