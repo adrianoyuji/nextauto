@@ -55,11 +55,6 @@ export enum Transmission {
   CVT = "CVT",
 }
 
-export interface Years extends Document {
-  firstYear: number;
-  secondYear: number;
-}
-
 export interface Features extends Document {
   cylinders?: string;
   engine?: string;
@@ -94,7 +89,7 @@ export interface ISale extends Document {
   description: string;
   createdAt: Date;
   features: Features;
-  year: Years;
+  year: Number;
   price: Price;
   photo: Array<string>;
   ownerId: string;
@@ -124,10 +119,7 @@ export const SaleSchema: Schema = new Schema(
       hp: { type: String },
       doors: { type: String },
     },
-    year: {
-      firstYear: { type: Number, required: true },
-      secondYear: { type: Number, required: true },
-    },
+    year: { type: Number, required: true },
     price: {
       value: { type: Number, required: true },
       currency: { type: String, required: true },
