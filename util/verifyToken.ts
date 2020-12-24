@@ -1,4 +1,3 @@
-import { defaults } from "joi";
 import jwt from "jsonwebtoken";
 import type { NextApiRequest, NextApiResponse } from "next";
 const { TOKEN_SECRET } = process.env;

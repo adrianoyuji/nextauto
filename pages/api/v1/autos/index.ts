@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { connectToDatabase } from "../../../../util/mongodb";
-import Sale from "../../../../schemas/Sale";
+import Sale from "../../../../models/Sale";
 import Joi from "joi";
 import verifyToken from "../../../../util/verifyToken";
 import { ObjectId } from "mongodb";
@@ -106,7 +106,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const paramsValidation = paramsSchema.validate(req.query);
       if (!!paramsValidation.error) {
         res.statusCode = 400;
-        res.json({ error: paramsValidation.error });
+        res.json({ message: paramsValidation.error });
         break;
       }
 
@@ -151,19 +151,19 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "POST":
       const validToken = verifyToken({ req, res });
       if (!validToken) {
-        res.status(401).json({ error: "unauthorized" });
+        res.status(401).json({ message: "unauthorized" });
         break;
       }
       const { error } = saleSchema.validate(req.body);
       if (!!error) {
-        res.status(400).json({ error: error });
+        res.status(400).json({ message: error });
         break;
       }
       const user = await db
         .collection("users")
         .findOne({ _id: new ObjectId(req.body.ownerId) });
       if (!user) {
-        res.status(400).json({ error: "Owner Id does not exist" });
+        res.status(400).json({ message: "Owner Id does not exist" });
         break;
       }
 
@@ -203,10 +203,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
         res.status(201).json({ id: newSale._id });
       } catch (err) {
-        res.status(502).json({ error: err });
+        res.status(502).json({ message: err });
       }
       break;
     default:
-      res.status(405).json({ error: "Method not Allowed" });
+      res.status(405).json({ message: "Method not Allowed" });
   }
 };

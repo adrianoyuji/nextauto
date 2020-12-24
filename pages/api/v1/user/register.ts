@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { connectToDatabase } from "../../../../util/mongodb";
 import Joi from "joi";
-import User from "../../../../schemas/User";
+import User from "../../../../models/User";
 import bcrypt from "bcrypt";
 
 const registerSchema = Joi.object({
@@ -30,7 +30,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const { error } = registerSchema.validate(req.body);
       if (!!error) {
         res.statusCode = 400;
-        res.json({ error: error });
+        res.json({ message: error });
         break;
       }
 
@@ -40,7 +40,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         .findOne({ email: req.body.email });
       if (emailExist) {
         res.statusCode = 400;
-        res.json({ error: "Email already exists" });
+        res.json({ message: "Email already exists" });
         break;
       }
 
@@ -63,10 +63,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         await db.collection("users").insertOne(user);
         res.status(201).json({ user: user._id });
       } catch (err) {
-        res.status(502).json({ error: err });
+        res.status(502).json({ message: err });
       }
       break;
     default:
-      res.status(405).json({ error: "Method not Allowed" });
+      res.status(405).json({ message: "Method not Allowed" });
   }
 };

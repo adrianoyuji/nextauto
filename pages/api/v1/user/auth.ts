@@ -19,7 +19,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       //validate body req
       const { error } = authSchema.validate(req.body);
       if (!!error) {
-        res.status(400).json({ error: error });
+        res.status(400).json({ message: error });
         break;
       }
 
@@ -28,7 +28,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         .collection("users")
         .findOne({ email: req.body.email });
       if (!user) {
-        res.status(400).json({ error: "Invalid email" });
+        res.status(400).json({ message: "Invalid email" });
         break;
       }
 
